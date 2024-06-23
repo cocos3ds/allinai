@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考生信息录入</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #e9ecef;
+        }
+        .container {
+            display: flex;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 1000px;
+            overflow: hidden;
+        }
+        .sidebar {
+            background-color: #f8f9fa;
+            width: 30%;
+            padding: 20px;
+            box-sizing: border-box;
+            border-right: 1px solid #ced4da;
+        }
+        .content {
+            width: 70%;
+            padding: 40px 50px;
+            box-sizing: border-box;
+        }
+        .content h2 {
+            margin-bottom: 20px;
+            color: #343a40;
+            text-align: center;
+        }
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            flex: 0 0 100px;
+            margin-right: 10px;
+            font-size: 16px;
+            color: #757575;
+        }
+        .form-group input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        .form-group input[type="text"]:focus {
+            border-color: #007bff;
+        }
+        .content input[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .content input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+        .student-list {
+            list-style: none;
+            padding: 0;
+        }
+        .student-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ced4da;
+        }
+        .student-list li .delete {
+            cursor: pointer;
+            color: #dc3545;
+        }
+        .chat-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .chat-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 400px;
+            height: 500px;
+            background-color: #ffffff;
+            border: 1px solid #ced4da;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-window .chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            text-align: center;
+        }
+        .chat-window .chat-body {
+            padding: 10px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        .chat-message {
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        .chat-message.user {
+            align-self: flex-end;
+            background-color: #d1ecf1;
+        }
+        .chat-message.ai {
+            align-self: flex-start;
+            background-color: #f8d7da;
+        }
+        .chat-window .chat-footer {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ced4da;
+        }
+        .chat-window .chat-footer input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .chat-window .chat-footer button {
+            margin-left: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+        }
+        .chat-window .chat-footer button:hover {
+            background-color: #0056b3;
+        }
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 30px;
+            height: 30px;
+            margin-left: 10px;
+        }
+        .loading .dot {
+            width: 8px;
+            height: 8px;
+            margin: 0 2px;
+            background-color: #007bff;
+            border-radius: 50%;
+            animation: bounce 0.6s infinite alternate;
+        }
+        .loading .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .loading .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes bounce {
+            to {
+                transform: translateY(-100%);
+            }
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // 获取考生列表
+            function fetchStudents() {
+                $.ajax({
+                    url: 'fetch_students.php',
+                    method: 'GET',
+                    success: function(response) {
+                        var studentList = $('.student-list');
+                        studentList.empty();
+                        response.data.forEach(function(student) {
+                            studentList.append('<li>' + student.name + '<span class="delete" data-id="' + student.id + '">x</span></li>');
+                        });
+                    },
+                    error: function() {
+                        alert('无法获取考生列表，请重试。');
+                    }
+                });
+            }
+
+            // 获取初始考生列表
+            fetchStudents();
+
+            // 提交表单
+            $('form').on('submit', function(event) {
+                event.preventDefault();
+                $.ajax({
+                    url: 'save.php',
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $('.message').text(response.message).css('color', response.status === 'success' ? 'green' : 'red');
+                        if (response.status === 'success') {
+                            fetchStudents(); // 更新考生列表
+                        }
+                    },
+                    error: function() {
+                        $('.message').text('请求失败，请重试。').css('color', 'red');
+                    }
+                });
+            });
+
+            // 删除考生
+            $('.student-list').on('click', '.delete', function() {
+                var studentId = $(this).data('id');
+                $.ajax({
+                    url: 'delete_student.php',
+                    method: 'POST',
+                    data: { id: studentId },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            fetchStudents(); // 更新考生列表
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('删除失败，请重试。');
+                    }
+                });
+            });
+
+            // 显示和隐藏聊天窗口
+            $('.chat-button').on('click', function() {
+                $('.chat-window').toggle();
+            });
+
+            // 发送聊天信息
+            $('.chat-window .chat-footer button').on('click', function() {
+                var userInput = $('.chat-window .chat-footer input[type="text"]').val();
+                if (userInput.trim() !== '') {
+                    var chatBody = $('.chat-window .chat-body');
+                    chatBody.append('<div class="chat-message user">' + userInput + '</div>');
+                    chatBody.scrollTop(chatBody.prop("scrollHeight"));
+                    
+                    // 显示加载指示器
+                    var loadingIndicator = $('<div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>');
+                    chatBody.append(loadingIndicator);
+                    
+                    $.ajax({
+                        url: 'sendtoai.php',
+                        method: 'POST',
+                        data: { message: userInput },
+                        success: function(response) {
+                            loadingIndicator.remove(); // 移除加载指示器
+                            chatBody.append('<div class="chat-message ai">' + response.reply + '</div>');
+                            chatBody.scrollTop(chatBody.prop("scrollHeight"));
+                        },
+                        error: function() {
+                            loadingIndicator.remove(); // 移除加载指示器
+                            alert('无法发送消息，请重试。');
+                        }
+                    });
+                    $('.chat-window .chat-footer input[type="text"]').val('');
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h3>考生列表</h3>
+            <ul class="student-list"></ul>
+        </div>
+        <div class="content">
+            <h2>考生信息录入</h2>
+            <form>
+                <div class="form-group">
+                    <label for="name">姓名:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <input type="submit" value="提交">
+            </form>
+            <div class="message"></div>
+        </div>
+    </div>
+    <button class="chat-button">AI</button>
+    <div class="chat-window">
+        <div class="chat-header">聊天窗口</div>
+        <div class="chat-body"></div>
+        <div class="chat-footer">
+            <input type="text" placeholder="输入消息">
+            <button>发送</button>
+        </div>
+    </div>
+</body>
+</html>
