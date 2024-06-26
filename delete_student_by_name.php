@@ -1,5 +1,5 @@
 <?php
-require_once("db.php");//获取mysqli连接
+require_once("db.php"); //获取mysqli连接
 
 // 检查连接
 if ($conn->connect_error) {
@@ -10,19 +10,19 @@ if ($conn->connect_error) {
 header('Content-Type: application/json');
 
 // 获取POST数据
-$id = $_POST['id'];
+$name = $_POST['name'];
 
 
-// 检查是否有ID
-if (empty($id)) {
-    echo json_encode(['status' => 'error', 'message' => '缺少ID参数']);
+// 检查是否有name
+if (empty($name)) {
+    echo json_encode(['status' => 'error', 'message' => '缺少name参数']);
     exit();
 }
 
-$id = $conn->real_escape_string($id);
+$name = $conn->real_escape_string($name);
 
 // 删除考生
-$sql = "DELETE FROM students WHERE id = '$id'";
+$sql = "DELETE FROM students WHERE name = '$name'";
 
 if ($conn->query($sql) === TRUE) {
     echo json_encode(['status' => 'success', 'message' => '考生删除成功']);

@@ -1,14 +1,8 @@
 <?php
+//这是获取考生列表的文件，目前会返回考生id和name
 header('Content-Type: application/json');
 
-$servername = "localhost";
-$username = "root"; // 替换为你的数据库用户名
-$password = "root"; // 替换为你的数据库密码
-$dbname = "exam_db";
-$port = 3307;
-
-// 创建连接
-$conn = new mysqli($servername, $username, $password, $dbname,$port);
+require_once("db.php");//获取mysqli连接
 
 // 检查连接
 if ($conn->connect_error) {
@@ -16,7 +10,7 @@ if ($conn->connect_error) {
 }
 
 $response = array();
-
+//查询考生的信息，获取id和考生的name
 $sql = "SELECT id, name FROM students";
 $result = $conn->query($sql);
 
