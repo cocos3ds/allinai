@@ -10,5 +10,5 @@
 
 
     function writeLog($str){
-        file_put_contents("log.txt",date("Y-m-d H:i:s").'---'.$str."\n");
+        file_put_contents("log.txt",date("Y-m-d H:i:s").'---'.$str."\n",FILE_APPEND);
     }
