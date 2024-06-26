@@ -1,8 +1,9 @@
 <?php
 header('Content-Type: application/json');
+require_once("db.php");//获取mysqli连接
 // 假设的API URL和API密钥
 $apiUrl = 'https://api.moonshot.cn/v1/chat/completions';
-$apiKey = '';
+$apiKey = 'sk-8EiijDnuZokTisMQrIxcGm5DLR2R0afw7ykJVAaWRE6X4x5l';
 $message = $_POST['message'];
 // 请求参数，根据API文档调整
 $system_prompt = file_get_contents('prompt.txt');
@@ -85,6 +86,8 @@ if (curl_errno($ch)) {
                 }
             }
         }
+
+        echo json_encode(['reply'=>['status'=>'ok','msg'=>'执行成功']]);
     }
    
 }

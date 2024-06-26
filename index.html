@@ -217,15 +217,16 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
 
-        // 获取考生列表
+        // 获取考生列表,
         function fetchStudents() {
                 $.ajax({
-                    url: 'fetch_students.php',
+                    url: 'fetch_students.php',//调用获取考生列表接口，目前只返回name和id
                     method: 'GET',
                     success: function(response) {
                         var studentList = $('.student-list');
                         studentList.empty();
                         response.data.forEach(function(student) {
+                            //拿到考生的name 和id，将考生的名字name 插入到列表中，将id设置为data-id的值，当用户点击时传到删除接口实现删除功能，目前考生列表只显示考生姓名，如果要展示其他信息请修改这里
                             studentList.append('<li>' + student.name + '<span class="delete" data-id="' + student.id + '">x</span></li>');
                         });
                     },
@@ -340,7 +341,12 @@
                             try {
                                 
                                 var jsonResponse = response.reply;
-                                processResponse(jsonResponse);
+                                if(jsonResponse?.status === 'ok'){
+
+                                }else{
+                                    processResponse(jsonResponse);
+                                }
+                              
                                 loadingIndicator.remove(); // 移除加载指示器
                                 chatBody.append('<div class="chat-message ai">' + "执行成功" + '</div>');
                                 chatBody.scrollTop(chatBody.prop("scrollHeight"));
