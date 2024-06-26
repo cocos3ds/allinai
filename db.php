@@ -7,3 +7,8 @@
 
     // 创建连接
     $conn = new mysqli($servername, $username, $password, $dbname,$port);
+
+
+    function writeLog($str){
+        file_put_contents("log.txt",date("Y-m-d H:i:s").'---'.$str."\n");
+    }
