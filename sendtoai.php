@@ -5,15 +5,20 @@ require_once("db.php");//获取mysqli连接
 $apiUrl = 'https://api.moonshot.cn/v1/chat/completions';
 $apiKey = 'sk-8EiijDnuZokTisMQrIxcGm5DLR2R0afw7ykJVAaWRE6X4x5l';
 $message = $_POST['message'];
+writeLog($message);
 // 请求参数，根据API文档调整
 $system_prompt = file_get_contents('prompt.txt');
+$exclude_file = ['cacert.pem','test.php','prompt.txt','sendtoai.php','kimireturn.txt','debug_prompt.txt','estimate_token.php','index_template.html','jquery-3.6.0.min.js','css2.css','log.txt'];
+$project_file = listFilesAndContents($exclude_file);
 
-$project_file = listFilesAndContents(['cacert.pem','test.php','prompt.txt','sendtoai.php','kimireturn.txt','debug_prompt.txt']);
+$system_prompt = str_replace("[project file]",$project_file,$system_prompt);
+file_put_contents("debug_prompt.txt","\n--------------------\n".$system_prompt."\n--------------------\n",FILE_APPEND);
 
 $system_prompt = str_replace("[project file]",$project_file,$system_prompt);
 file_put_contents("debug_prompt.txt","\n--------------------\n".$system_prompt."\n--------------------\n",FILE_APPEND);
 $postData = [
     "model" => "moonshot-v1-32k",
+    "max_tokens"=>20000,
     "messages" => [
         ["role" => "system", "content" => $system_prompt],
         ["role" => "user", "content" => $message]
@@ -42,14 +47,19 @@ $response = curl_exec($ch);
 if (curl_errno($ch)) {
     echo 'cURL Error: ' . curl_error($ch);
 } else {
-    
+    writeLog("kimi response:".$response);
     // 解析响应数据
     $responseData = json_decode($response, true);
+
+    if(isset($responseData['error'])){
+        echo json_encode(['reply'=>[],'status'=>'error','msg'=>$responseData['error']['message'],'type'=>'kimierror']);
+    }
+
     $replyStr =  $responseData['choices'][0]['message']['content'];
     file_put_contents("kimireturn.txt","\n--------------------\n".$replyStr."\n--------------------\n",FILE_APPEND);
     $reply = json_decode($replyStr,true);
     if($reply['type'] == 'site'){
-        echo json_encode(['reply'=>$reply['site']['mission']]);
+        echo json_encode(['reply'=>$reply['site']['mission'],'status'=>'ok','msg'=>'执行成功','type'=>'site']);
     }else{
         // 执行SQL查询
         if (isset($reply['server']['sql']['query'])) {
@@ -62,8 +72,8 @@ if (curl_errno($ch)) {
         }
 
         // 替换文件内容
-        if (isset($reply['server']['files']['replace'])) {
-            foreach ($reply['server']['files']['replace'] as $file) {
+        if (isset($reply['server']['files']['modify'])) {
+            foreach ($reply['server']['files']['modify'] as $file) {
                 $filename = $file['filename'];
                 $newcontent = $file['newcontent'];
                 if (file_put_contents($filename, $newcontent) !== false) {
@@ -73,6 +83,56 @@ if (curl_errno($ch)) {
                 }
             }
         }
+        //  // 替换文件内容
+        //  if (isset($reply['server']['files']['index'])) {
+        //     $index_file = $reply['server']['files']['index'];
+        //     if(!empty($index_file['css'])){
+        //         $css  = $index_file['css'];
+        //     }else{
+        //         $css = file_get_contents("index_css.txt");
+        //         $css = explode("\n",$css);
+        //         array_shift($css);
+        //         $css = implode("\n",$css);
+        //     }
+
+        //     if(!empty($index_file['index_css'])){
+        //         $css  = $index_file['index_css'];
+        //     }else{
+        //         $css = file_get_contents("index_css.txt");
+        //         $css = explode("\n",$css);
+        //         array_shift($css);
+        //         $css = implode("\n",$css);
+        //     }
+
+        //     if(!empty($index_file['index_body'])){
+        //         $body  = $index_file['index_body'];
+        //     }else{
+        //         $body = file_get_contents("index_body.txt");
+        //         $body = explode("\n",$body);
+        //         array_shift($body);
+        //         $body = implode("\n",$body);
+        //     }
+
+        //     if(!empty($index_file['index_javascript'])){
+        //         $js  = $index_file['index_javascript'];
+        //     }else{
+        //         $js = file_get_contents("index_javascript.txt");
+        //         $js = explode("\n",$js);
+        //         array_shift($js);
+        //         $js = implode("\n",$js);
+        //     }
+
+        //     $index_template = file_get_contents("index_template.html");
+        //     $index_template = str_replace("{{css}}",$css,$index_template);
+        //     $index_template = str_replace("{{body}}",$body,$index_template);
+        //     $index_template = str_replace("{{js}}",$js,$index_template);
+        //     if (file_put_contents("index.html", $index_template) !== false) {
+        //         writeLog("File index.html updated successfully");
+        //     } else{
+        //         writeLog("File index.html updated fail");
+        //     }
+    
+        // }
 
         // 新增文件
         if (isset($reply['server']['files']['add'])) {
@@ -86,8 +146,7 @@ if (curl_errno($ch)) {
                 }
             }
         }
-
-        echo json_encode(['reply'=>['status'=>'ok','msg'=>'执行成功']]);
+        echo json_encode(['reply'=>[],'status'=>'ok','msg'=>'执行成功','type'=>'server']);
     }
    
 }

@@ -56,9 +56,10 @@ POST /save.php
         
     }
 }
-
-如果用户想要新增网站功能，你要先参考本项目的源代码，再思考怎么实现用户的功能，这会涉及几个操作，可能会修改mysql，新增文件，替换旧文件的内容
-你需要根据用户要求，按以下格式输出需要执行的sql（可能要添加某个字段，或者删除某个字段，创建新表，删除表），需要替换的文件，以及新增的文件（如果有的话）,你不能省略代码，必须全部返回
+## 不要省略修改文件的代码，必须返回完整的代码
+## 不要省略修改文件的代码，必须返回完整的代码
+如果用户想要新增网站功能，你要先参考本项目的源代码，再思考怎么实现用户的功能，这会涉及几个操作，可能会修改mysql，新增文件，修改旧文件的内容，将修改后的文件的完整内容给我，不要省略
+你需要根据用户要求，按以下格式输出需要执行的sql（可能要添加某个字段，或者删除某个字段，创建新表，删除表），用修改后的文件替换，以及新增的文件（如果有的话）,你不能省略代码，必须全部返回
 {
     "type":"server",
     "site":{
@@ -69,16 +70,16 @@ POST /save.php
             "query": "DELETE FROM students WHERE name = ?"
         },
         "files": {
-            "replace": [
+            "modify": [
                 {
-                    "filename": "file_to_replace.php",
-                    "newcontent": "<?php echo 'This is the updated content'; ?>"
+                    "filename": "file_to_modify.php",
+                    "newcontent": "这里用修改后的完整文件内容替换"
                 }
             ],
             "add": [
                 {
                     "filepath": "newfile.php",
-                    "content": "<?php echo 'This is a new file'; ?>"
+                    "content": "这里用新文件的完整文件内容替换"
                 }
             ]
         }
