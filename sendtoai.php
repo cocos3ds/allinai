@@ -2,23 +2,24 @@
 header('Content-Type: application/json');
 require_once("db.php");//获取mysqli连接
 // 假设的API URL和API密钥
-$apiUrl = 'https://api.moonshot.cn/v1/chat/completions';
-$apiKey = 'sk-8EiijDnuZokTisMQrIxcGm5DLR2R0afw7ykJVAaWRE6X4x5l';
+// $apiUrl = 'https://api.moonshot.cn/v1/chat/completions'; //kimi
+// $apiKey = 'sk-8EiijDnuZokTisMQrIxcGm5DLR2R0afw7ykJVAaWRE6X4x5l'; //kimi
+$apiUrl = 'https://api.bianxieai.com/v1/chat/completions';
+$apiKey = 'sk-JSEjknl289dBzb6HD1BdCeE256Ea44BbB13e1361E40b45D4';
+set_time_limit(0);
 $message = $_POST['message'];
 writeLog($message);
 // 请求参数，根据API文档调整
 $system_prompt = file_get_contents('prompt.txt');
-$exclude_file = ['cacert.pem','test.php','prompt.txt','sendtoai.php','kimireturn.txt','debug_prompt.txt','estimate_token.php','index_template.html','jquery-3.6.0.min.js','css2.css','log.txt'];
+$exclude_file = ['cacert.pem','delete_student.php','db.php','database_sql.sql','save.php','delete_student_by_name.php','fetch_students.php','test.php','prompt.txt','sendtoai.php','kimireturn.txt','debug_prompt.txt','estimate_token.php','index_template.html','jquery-3.6.0.min.js','css2.css','log.txt'];
 $project_file = listFilesAndContents($exclude_file);
 
 $system_prompt = str_replace("[project file]",$project_file,$system_prompt);
-file_put_contents("debug_prompt.txt","\n--------------------\n".$system_prompt."\n--------------------\n",FILE_APPEND);
-
-$system_prompt = str_replace("[project file]",$project_file,$system_prompt);
+// $system_prompt = $system_prompt."\n".$message;
 file_put_contents("debug_prompt.txt","\n--------------------\n".$system_prompt."\n--------------------\n",FILE_APPEND);
 $postData = [
-    "model" => "moonshot-v1-32k",
-    "max_tokens"=>20000,
+    "model" => "gpt-3.5-turbo",
+    // "max_tokens"=>20000,
     "messages" => [
         ["role" => "system", "content" => $system_prompt],
         ["role" => "user", "content" => $message]
@@ -53,11 +54,13 @@ if (curl_errno($ch)) {
 
     if(isset($responseData['error'])){
         echo json_encode(['reply'=>[],'status'=>'error','msg'=>$responseData['error']['message'],'type'=>'kimierror']);
+        exit();
     }
 
     $replyStr =  $responseData['choices'][0]['message']['content'];
     file_put_contents("kimireturn.txt","\n--------------------\n".$replyStr."\n--------------------\n",FILE_APPEND);
     $reply = json_decode($replyStr,true);
+    // print($reply);exit();
     if($reply['type'] == 'site'){
         echo json_encode(['reply'=>$reply['site']['mission'],'status'=>'ok','msg'=>'执行成功','type'=>'site']);
     }else{
