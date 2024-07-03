@@ -369,8 +369,8 @@
                             try {
                                 let msg = "";
                                 var jsonResponse = response.reply;
-                                msg = jsonResponse.msg;
-                                if(jsonResponse.status === 'ok' && jsonResponse.type == 'site'){
+                                msg = response.msg;
+                                if(response.status === 'ok' && response.type == 'site'){
                                     processResponse(jsonResponse);
                                 }
                               
